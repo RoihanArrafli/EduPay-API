@@ -19,7 +19,7 @@ class Student extends Model
         'kelas',
         'SPP'
     ];
-
+// hehe
     protected function file(): Attribute {
         return Attribute::make(
             get: fn($file) => url('/storage/data/siswa/' . $file),

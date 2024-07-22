@@ -20,7 +20,7 @@ class StudentController extends Controller
             'data' => $students
         ], 200);
     }
-
+// hehe
     public function addStudent(Request $request) {
         $validator = Validator::make($request->all(), [
             'nama' => 'required',
