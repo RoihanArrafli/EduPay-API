@@ -13,4 +13,8 @@ class Kelas extends Model
         'tingkat_kelas',
         'nominal_spp'
     ];
+
+    public function students() {
+        return $this->hasMany(Student::class);
+    }
 }

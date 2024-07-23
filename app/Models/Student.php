@@ -25,5 +25,27 @@ class Student extends Model
             get: fn($file) => url('/storage/data/siswa/' . $file),
         );
     }
+
+    public function kelas() {
+        return $this->belongsTo(Kelas::class);
+    }
+
+    protected static function boot() {
+        parent::boot();
+
+        static::creating(function ($student) {
+            $kelas = Kelas::find($student->kelas_id);
+            if ($kelas) {
+                $student->tagihan_spp = $kelas->nominal_spp;
+            }
+        });
+
+        static::updating(function ($student) {
+            $kelas = Kelas::find($student->kelas_id);
+            if ($kelas) {
+                $student->tagihan_spp = $kelas->nominal_spp;
+            }
+        });
+    }
 }
 // hehe
