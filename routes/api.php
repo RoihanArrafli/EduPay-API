@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\PembayaranController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\API\StudentController;
 use Illuminate\Http\Request;
@@ -20,6 +21,9 @@ Route::prefix('v1.2')->group(function () {
     Route::get('/students/show/{id}', [StudentController::class, 'showStudent']);
     Route::post('/students/update/{id}', [StudentController::class, 'updateStudent']);
     Route::delete('/students/delete/{id}', [StudentController::class, 'deleteStudent']);
+    
+    Route::post('/pembayaran/store', [PembayaranController::class, 'submitPembayaran']);
+    Route::post('notification/handler', [PembayaranController::class, 'notificationHandler']);
 
     Route::get('/posts', [PostController::class, 'index']);
     Route::post('/posts', [PostController::class, 'store']);
