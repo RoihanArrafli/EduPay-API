@@ -22,7 +22,7 @@ class StudentImport implements ToModel, WithHeadingRow
             'ortu' => $row['ortu'],
             'TTL' => $row['ttl'],
             'kelas' => $row['kelas'],
-            'SPP' => $row['spp'],
+            'tagihan_spp' => $row['tagihan_spp'],
         ]);
     }
 

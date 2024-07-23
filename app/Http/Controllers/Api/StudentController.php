@@ -29,7 +29,7 @@ class StudentController extends Controller
             'ortu' => 'required',
             'TTL' => 'required',
             'kelas' => 'required',
-            'SPP' => 'required'
+            'tagihan_spp' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -47,7 +47,7 @@ class StudentController extends Controller
             'ortu' => $request->ortu,
             'TTL' => $request->TTL,
             'kelas' => $request->kelas,
-            'SPP' => $request->SPP
+            'tagihan_spp' => $request->tagihan_spp
         ]);
 
         return response()->json([
@@ -101,7 +101,7 @@ class StudentController extends Controller
             'ortu' => 'required',
             'TTL' => 'required',
             'kelas' => 'required',
-            'SPP' => 'required'
+            'tagihan_spp' => 'required'
         ]);
 
         if($validator->fails()) {

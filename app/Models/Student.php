@@ -17,7 +17,7 @@ class Student extends Model
         'ortu',
         'TTL',
         'kelas',
-        'SPP'
+        'tagihan_spp'
     ];
 // hehe
     protected function file(): Attribute {
