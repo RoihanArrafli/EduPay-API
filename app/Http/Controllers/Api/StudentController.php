@@ -6,6 +6,7 @@ use App\Imports\StudentImport;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Kelas;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -28,8 +29,8 @@ class StudentController extends Controller
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'ortu' => 'required',
             'TTL' => 'required',
-            'kelas' => 'required',
-            'tagihan_spp' => 'required'
+            // 'kelas' => 'required',
+            'kelas_id' => 'required|exists:kelas,id',
         ]);
 
         if ($validator->fails()) {
@@ -40,14 +41,16 @@ class StudentController extends Controller
             ], 401);
         }
 
+        $kelas = Kelas::find($request->kelas_id);
         $data = Student::create([
             'nama' => $request->nama,
             'alamat' => $request->alamat,
             'jenis_kelamin' => $request->jenis_kelamin,
             'ortu' => $request->ortu,
             'TTL' => $request->TTL,
-            'kelas' => $request->kelas,
-            'tagihan_spp' => $request->tagihan_spp
+            'kelas_id' => $request->kelas_id,
+            'kelas' => $kelas->tingkat_kelas,
+            'tagihan_spp' => $kelas->nomi
         ]);
 
         return response()->json([
@@ -100,8 +103,8 @@ class StudentController extends Controller
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'ortu' => 'required',
             'TTL' => 'required',
-            'kelas' => 'required',
-            'tagihan_spp' => 'required'
+            // 'kelas' => 'required',
+            'kelas_id' => 'required|exists:kelas,id',
         ]);
 
         if($validator->fails()) {
@@ -121,7 +124,14 @@ class StudentController extends Controller
             ], 404);
         }
 
-        $student->update($request->all());
+        // $student->update($request->all());
+
+        $kelas = Kelas::find($request->kelas_id);
+        $requestData = $request->all();
+        $requestData['kelas'] = $kelas->tingkat_kelas;
+        $requestData['tagihan_spp'] = $kelas->nominal_spp;
+
+        $student->update($requestData);
 
         return response()->json([
             'success' => true,

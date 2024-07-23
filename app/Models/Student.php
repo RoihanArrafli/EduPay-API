@@ -17,7 +17,8 @@ class Student extends Model
         'ortu',
         'TTL',
         'kelas',
-        'nis'
+        'kelas_id',
+        'tagihan_spp'
     ];
 // hehe
     protected function file(): Attribute {
@@ -36,14 +37,14 @@ class Student extends Model
         static::creating(function ($student) {
             $kelas = Kelas::find($student->kelas_id);
             if ($kelas) {
-                $student->nis = $kelas->nominal_spp;
+                $student->tagihan_spp = $kelas->nominal_spp;
             }
         });
 
         static::updating(function ($student) {
             $kelas = Kelas::find($student->kelas_id);
             if ($kelas) {
-                $student->nis = $kelas->nominal_spp;
+                $student->tagihan_spp = $kelas->nominal_spp;
             }
         });
     }

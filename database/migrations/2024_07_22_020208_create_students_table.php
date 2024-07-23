@@ -18,9 +18,9 @@ return new class extends Migration
             $table->enum('jenis_kelamin', ['laki-laki', 'perempuan']);
             $table->string('ortu');
             $table->string('TTL');
+            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
             $table->string('kelas');
-            $table->foreignId('nis')->constrained('kelas')->onDelete('cascade');
-            $table->integer('tagihan_spp')->nullable();
+            $table->decimal('tagihan_spp', 20, 2)->nullable();
             $table->timestamps();
         });
     }
