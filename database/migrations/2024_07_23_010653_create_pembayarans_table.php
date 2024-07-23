@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
             $table->string('donor_name')->nullable();
             $table->string('donor_email')->nullable();
             $table->string('donation_type')->nullable();

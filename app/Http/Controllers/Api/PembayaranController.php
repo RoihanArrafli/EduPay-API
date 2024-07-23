@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 
@@ -33,9 +34,7 @@ class PembayaranController extends Controller
     {
         Log::info('Request Data: ', $request->all());
         $validator = Validator::make($request->all(), [
-            'donor_name' => 'required',
-            'donor_email' => 'required|email',
-            'amount' => 'required|numeric'
+            'student_id' => 'required|exists:students,id'
         ]);
 
         if ($validator->fails()) {
@@ -46,13 +45,23 @@ class PembayaranController extends Controller
         }
 
         $data = DB::transaction(function () use ($request) {
+            $student = Student::find($request->student_id);
+
+            if (!$student) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Siswa Tidak ditemukan!'
+                ], 404);
+            }
+
             Log::info('Creating Pembayaran record.');
             $pembayaran = Pembayaran::create([
-                'donor_name' => $request->donor_name,
+                'student_id' => $student->id,
+                'donor_name' => $student->nama,
                 'donor_email' => $request->donor_email,
-                'donation_type' => $request->donation_type,
-                'amount' => floatval($request->amount),
-                'note' => $request->note,
+                'donation_type' => 'SPP',
+                'amount' => floatval($student->tagihan_spp),
+                'note' => 'Pembayaran SPP untuk ' . $student->nama,
                 // 'donor_name' => $this->request->donor_name,
                 // 'donor_email' => $this->request->donor_email,
                 // 'donation_type' => $this->request->donation_type,
@@ -73,10 +82,10 @@ class PembayaranController extends Controller
                 ],
                 'item_details' => [
                     [
-                        'id' => $pembayaran->donation_type,
+                        'id' => 'SPP-' . $student->id,
                         'price' => $pembayaran->amount,
                         'quantity' => 1,
-                        'name' => ucwords(str_replace('_', ' ', $pembayaran->donation_type))
+                        'name' => 'Pembayaran SPP'
                     ]
                 ]
             ];

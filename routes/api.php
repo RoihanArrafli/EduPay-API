@@ -29,8 +29,8 @@ Route::prefix('v1.2')->group(function () {
     Route::get('/kelas/update/{id}', [KelasController::class, 'updateKelas']);
     Route::get('/kelas/delete/{id}', [KelasController::class, 'deleteKelas']);
     
-    Route::post('/pembayaran/store', [PembayaranController::class, 'submitPembayaran']);
-    Route::post('notification/handler', [PembayaranController::class, 'notificationHandler']);
+    Route::post('/pembayaran', [PembayaranController::class, 'submitPembayaran']);
+    Route::post('notification', [PembayaranController::class, 'notificationHandler']);
 
     Route::get('/posts', [PostController::class, 'index']);
     Route::post('/posts', [PostController::class, 'store']);

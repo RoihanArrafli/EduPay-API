@@ -14,8 +14,13 @@ class Pembayaran extends Model
         'donor_email',
         'donation_type',
         'amount',
+        'student_id',
         'note'
     ];
+
+    public function student() {
+        return $this->belongsTo(Student::class);
+    }
 
     public function setPending() {
         $this->attributes['status'] = 'pending';

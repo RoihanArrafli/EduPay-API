@@ -31,6 +31,10 @@ class Student extends Model
         return $this->belongsTo(Kelas::class);
     }
 
+    public function pembayarans() {
+        return $this->hasMany(Pembayaran::class);
+    }
+
     protected static function boot() {
         parent::boot();
 

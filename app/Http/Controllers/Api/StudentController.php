@@ -50,7 +50,7 @@ class StudentController extends Controller
             'TTL' => $request->TTL,
             'kelas_id' => $request->kelas_id,
             'kelas' => $kelas->tingkat_kelas,
-            'tagihan_spp' => $kelas->nomi
+            'tagihan_spp' => $kelas->nominal_spp
         ]);
 
         return response()->json([
