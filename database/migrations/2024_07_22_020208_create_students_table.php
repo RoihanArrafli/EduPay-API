@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('ortu');
             $table->string('TTL');
             $table->string('kelas');
-            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
+            $table->foreignId('nis')->constrained('kelas')->onDelete('cascade');
             $table->integer('tagihan_spp')->nullable();
             $table->timestamps();
         });
