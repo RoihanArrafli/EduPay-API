@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('kelas', function (Blueprint $table) {
             $table->id();
-            $table->decimal('spp', 20, 2);
+            $table->string('tingkat_kelas');
+            $table->decimal('nominal_spp', 20, 2);
             $table->timestamps();
         });
     }

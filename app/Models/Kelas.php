@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Kelas extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'tingkat_kelas',
+        'nominal_spp'
+    ];
 }
