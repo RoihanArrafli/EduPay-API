@@ -87,7 +87,12 @@ class PembayaranController extends Controller
                         'quantity' => 1,
                         'name' => 'Pembayaran SPP'
                     ]
-                ]
+                ],
+                'expiry' => [
+                    'start_time' => date('Y-m-d H:i:s T'),
+                    'unit' => 'day',
+                    'duration' => 1
+                ]    
             ];
             Log::info('Payload for Midtrans: ', $payload);
 
@@ -138,7 +143,7 @@ class PembayaranController extends Controller
 
     public function notificationHandler(Request $request)
 {
-    Log::info('Data Notifikasi: ', $request->all());
+    // Log::info('Data Notifikasi: ', $request->all());
     $notif = new Notification();
     Log::info('Respon Raw Notifikasi: ', (array)$notif->getResponse());
 
@@ -213,7 +218,7 @@ class PembayaranController extends Controller
         Log::error('Handler Notifikasi: ' . $e->getMessage(), ['exception' => $e]);
         return response()->json([
             'success' => false,
-            'message' => 'Error proses notifikasi: ' . $e->getMessage()
+            'message' => 'Error proses handle notifikasi: ' . $e->getMessage()
         ], 500);
     }
 }
