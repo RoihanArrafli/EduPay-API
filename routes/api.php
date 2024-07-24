@@ -30,7 +30,7 @@ Route::prefix('v1.2')->group(function () {
     Route::get('/kelas/delete/{id}', [KelasController::class, 'deleteKelas']);
     
     Route::post('/pembayaran', [PembayaranController::class, 'submitPembayaran']);
-    Route::post('notification', [PembayaranController::class, 'notificationHandler']);
+    Route::post('/notification', [PembayaranController::class, 'notificationHandler']);
 
     Route::get('/posts', [PostController::class, 'index']);
     Route::post('/posts', [PostController::class, 'store']);

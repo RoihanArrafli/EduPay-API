@@ -17,12 +17,12 @@ use Illuminate\Support\Facades\Validator;
 class PembayaranController extends Controller
 {
     protected $request;
-    protected $response;
+    // protected $response;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->response = [];
+        // $this->response = [];
 
         Config::$serverKey = config('services.midtrans.serverKey');
         Config::$isProduction = config('services.midtrans.isProduction');
@@ -41,7 +41,7 @@ class PembayaranController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first()
-            ], 402);
+            ], 422);
         }
 
         $data = DB::transaction(function () use ($request) {
@@ -92,19 +92,36 @@ class PembayaranController extends Controller
             Log::info('Payload for Midtrans: ', $payload);
 
             try {
-                $snapToken = Snap::getSnapToken($payload);
+                $snapResponse = Snap::createTransaction($payload);
+                $snapToken = $snapResponse->token ?? null;
+                $transactionId = $snapResponse->transaction_id ?? null;
                 Log::info('Snap Token: ', ['snap_token' => $snapToken]);
+                Log::info('Transaction ID: ', ['transaction_id' => $transactionId]);
+                if (!$snapToken) {
+                    throw new Exception('Gagal mendapatkan token Snap dari Midtrans');
+                    
+                }
                 $pembayaran->snap_token = $snapToken;
+                $pembayaran->transaction_id = $transactionId;
                 $pembayaran->save();
 
-                $this->response['snap_token'] = $snapToken;
-                return $pembayaran;
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pembayaran sedang diproses!',
+                    'data' => [
+                        'order_id' => $pembayaran->id,
+                        'snap_token' => $snapToken,
+                        'transaction_id' => $transactionId,
+                        'pembayaran' => $pembayaran
+                    ]
+                ]);
+
             } catch (Exception $e) {
                 Log::error('Midtrans API error: ' . $e->getMessage());
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Proses Pembayaran Error'
+                    'message' => 'Proses Pembayaran Error: ' . $e->getMessage(),
                 ], 500);
             }
         });
@@ -117,34 +134,201 @@ class PembayaranController extends Controller
         ]);
     }
 
+    protected $notif;
+
     public function notificationHandler(Request $request)
-    {
-        $notif = new Notification();
+{
+    Log::info('Data Notifikasi: ', $request->all());
+    $notif = new Notification();
+    Log::info('Respon Raw Notifikasi: ', (array)$notif->getResponse());
 
-        $transaction = $notif->transaction_status;
-        $type = $notif->payment_type;
-        $orderId = $notif->order_id;
-        $fraud = $notif->fraud_status;
-        $pembayaran = Pembayaran::findOrFail($orderId);
+    $transaction = $notif->transaction_status ?? null;
+    $type = $notif->payment_type ?? null;
+    $orderId = $notif->order_id ?? null;
+    $fraud = $notif->fraud_status ?? null;
+    $transactionId = $notif->transaction_id ?? null;
 
-        if ($transaction == 'capture') {
-            if ($type == 'credit_card') {
-                if ($fraud == 'challenge') {
-                    $pembayaran->setPending();
-                } else {
-                    $pembayaran->setSuccess();
-                }
-            }
-        } elseif ($transaction == 'settlement') {
-            $pembayaran->setSuccess();
-        } elseif ($transaction == 'pending') {
-            $pembayaran->setPending();
-        } elseif ($transaction == 'deny') {
-            $pembayaran->setFailed();
-        } elseif ($transaction == 'expire') {
-            $pembayaran->setExpired();
-        } elseif ($transaction == 'cancel') {
-            $pembayaran->setFailed();
-        }
+    if (!$orderId) {
+        Log::error('Handler Notifikasi: order_id tidak ditemukan');
+        return response()->json([
+            'success' => false,
+            'message' => 'order_id tidak ditemukan'
+        ], 400);
     }
+
+    $pembayaran = Pembayaran::find($orderId);
+    if (!$pembayaran) {
+        Log::error('Handler Notifikasi: Pembayaran tidak ditemukan untuk order_id ' . $orderId);
+        return response()->json([
+           'success' => false,
+           'message' => 'Pembayaran tidak ditemukan'
+        ], 404);
+    }
+
+    try {
+        switch ($transaction) {
+            case 'capture':
+                if ($type == 'credit_card') {
+                    if ($fraud == 'challenge') {
+                        $pembayaran->setPending();
+                    } else {
+                        $pembayaran->setSuccess();
+                    }
+                }
+                break;
+            case 'settlement':
+                $pembayaran->setSuccess();
+                break;
+            case 'pending':
+                $pembayaran->setPending();
+                break;
+            case 'deny':
+                $pembayaran->setFailed();
+                break;
+            case 'expire':
+                $pembayaran->setExpired();
+                break;
+            case 'cancel':
+                $pembayaran->setFailed();
+                break;
+            default:
+                Log::error('Handler Notifikasi: status transaksi tidak diketahui');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'status transaksi tidak diketahui'
+                ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi pembayaran terkirim',
+            'data' => [
+                'order_id' => $orderId,
+                'transaction' => $transaction,
+                'type' => $type,
+                'transaction_id' => $transactionId,
+            ]
+        ]);
+    } catch (Exception $e) {
+        Log::error('Handler Notifikasi: ' . $e->getMessage(), ['exception' => $e]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Error proses notifikasi: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+    
+
+    
+
+    // public function notificationHandler(Request $request)
+    // {
+    //     // Log::info('Notification Data: ', $request->all());
+    //     $notif = new Notification();
+    //     Log::info('Notification Raw response: ', $notif->getResponse());
+
+    //     // if (!$notif) {
+    //     //     Log::error('Notification Handler: No notification received');
+    //     //     return response()->json([
+    //     //        'success' => false,
+    //     //        'message' => 'No notification received'
+    //     //     ], 400);
+    //     // }
+
+    //     $transaction = $notif->transaction_status ?? null;
+    //     $type = $notif->payment_type ?? null;
+    //     $orderId = $notif->order_id ?? null;
+    //     $fraud = $notif->fraud_status ?? null;
+    //     // $transaction_id = $notif->transaction_id ?? null;
+
+    //     if (!$orderId) {
+    //         Log::error('Notification Handler: Missing order_id');
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Missing order_id'
+    //         ], 400);
+    //     }
+
+    //     $pembayaran = Pembayaran::find($orderId);
+    //     if (!$pembayaran) {
+    //         Log::error('Notification Handler: Pembayaran tidak ditemukan untuk order_id ' . $orderId);
+    //         return response()->json([
+    //            'success' => false,
+    //            'message' => 'Pembayaran tidak ditemukan'
+    //         ], 404);
+    //     }
+
+    //     try {
+    //         switch ($transaction) {
+    //             case 'capture':
+    //                 if ($type == 'credit_card') {
+    //                     if ($fraud == 'challenge') {
+    //                         $pembayaran->setPending();
+    //                     } else {
+    //                         $pembayaran->setSuccess();
+    //                     }
+    //                 }
+    //                 break;
+    //             case 'settlement':
+    //                 $pembayaran->setSuccess();
+    //                 break;
+    //             case 'pending':
+    //                 $pembayaran->setPending();
+    //                 break;
+    //             case 'deny':
+    //                 $pembayaran->setFailed();
+    //                 break;
+    //             case 'expire':
+    //                 $pembayaran->setExpired();
+    //                 break;
+    //             case 'cancel':
+    //                 $pembayaran->setFailed();
+    //                 break;
+    //             default:
+    //             Log::error('Notification Handler: status transaksi tidak diketahui');
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'status transaksi tidak diketahui'
+    //             ], 400);
+    //         }
+            
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Notifikasi pembayaran terkirim',
+    //             'data' => [
+    //                 'order_id' => $orderId,
+    //                 'transaction' => $transaction,
+    //                 'type' => $type,
+    //                 // 'transaction_id' => $transaction_id,
+    //             ]
+    //         ]);
+    //     } catch (Exception $e) {
+    //         Log::error('Notification Handler: ' . $e->getMessage(), ['exception' => $e]);
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error proses notifikasi: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+        
+    //     // if ($transaction == 'capture') {
+    //     //     if ($type == 'credit_card') {
+    //     //         if ($fraud == 'challenge') {
+    //     //             $pembayaran->setPending();
+    //     //         } else {
+    //     //             $pembayaran->setSuccess();
+    //     //         }
+    //     //     }
+    //     // } elseif ($transaction == 'settlement') {
+    //     //     $pembayaran->setSuccess();
+    //     // } elseif ($transaction == 'pending') {
+    //     //     $pembayaran->setPending();
+    //     // } elseif ($transaction == 'deny') {
+    //     //     $pembayaran->setFailed();
+    //     // } elseif ($transaction == 'expire') {
+    //     //     $pembayaran->setExpired();
+    //     // } elseif ($transaction == 'cancel') {
+    //     //     $pembayaran->setFailed();
+    //     // }
+    // }
 }

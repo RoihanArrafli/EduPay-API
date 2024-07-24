@@ -24,21 +24,21 @@ class Pembayaran extends Model
 
     public function setPending() {
         $this->attributes['status'] = 'pending';
-        self::save();
+        $this->save();
     }
 
     public function setSuccess() {
         $this->attributes['status'] = 'success';
-        self::save();
+        $this->save();
     }
 
     public function setFailed() {
         $this->attributes['status'] = 'failed';
-        self::save();
+        $this->save();
     }
 
     public function setExpired() {
         $this->attributes['status'] = 'expired';
-        self::save();
+        $this->save();
     }
 }
