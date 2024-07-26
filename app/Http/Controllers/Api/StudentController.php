@@ -29,6 +29,7 @@ class StudentController extends Controller
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'ortu' => 'required',
             'TTL' => 'required',
+            'nis' => 'required',
             // 'kelas' => 'required',
             'kelas_id' => 'required|exists:kelas,id',
         ]);
@@ -48,6 +49,7 @@ class StudentController extends Controller
             'jenis_kelamin' => $request->jenis_kelamin,
             'ortu' => $request->ortu,
             'TTL' => $request->TTL,
+            'nis' => $request->nis,
             'kelas_id' => $request->kelas_id,
             'kelas' => $kelas->tingkat_kelas,
             'tagihan_spp' => $kelas->nominal_spp
@@ -103,6 +105,7 @@ class StudentController extends Controller
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'ortu' => 'required',
             'TTL' => 'required',
+            'nis' => 'required',
             // 'kelas' => 'required',
             'kelas_id' => 'required|exists:kelas,id',
         ]);

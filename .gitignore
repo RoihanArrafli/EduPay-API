@@ -18,3 +18,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/App/Models/Pembayaran.txt
+/App/Http/Controllers/API/PembayaranController.txt
+/database/migrations/2024_07_23_010653_create_pembayarans_table.txt

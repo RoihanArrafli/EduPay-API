@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('nis');
             $table->string('nama');
             $table->string('alamat');
             $table->enum('jenis_kelamin', ['laki-laki', 'perempuan']);
@@ -20,7 +21,7 @@ return new class extends Migration
             $table->string('TTL');
             $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
             $table->string('kelas');
-            $table->decimal('tagihan_spp', 20, 2)->nullable();
+            $table->double('tagihan_spp')->nullable();
             $table->timestamps();
         });
     }

@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kelas', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->string('tingkat_kelas');
-            $table->double('nominal_spp');
+            $table->bigInteger('nis');
+            $table->string('order_id');
+            $table->string('status');
+            $table->double('amount');
+            $table->string('item_name');
+            $table->string('nama');
+            $table->string('email');
+            $table->string('checkout_link');
             $table->timestamps();
         });
     }
@@ -24,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kelas');
+        Schema::dropIfExists('payments');
     }
 };

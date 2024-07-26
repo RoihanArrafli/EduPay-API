@@ -18,7 +18,8 @@ class Student extends Model
         'TTL',
         'kelas',
         'kelas_id',
-        'tagihan_spp'
+        'tagihan_spp',
+        'nis'
     ];
 // hehe
     protected function file(): Attribute {
@@ -31,26 +32,26 @@ class Student extends Model
         return $this->belongsTo(Kelas::class);
     }
 
-    public function pembayarans() {
-        return $this->hasMany(Pembayaran::class);
-    }
+    // public function pembayarans() {
+    //     return $this->hasMany(Pembayaran::class);
+    // }
 
-    protected static function boot() {
-        parent::boot();
+    // protected static function boot() {
+    //     parent::boot();
 
-        static::creating(function ($student) {
-            $kelas = Kelas::find($student->kelas_id);
-            if ($kelas) {
-                $student->tagihan_spp = $kelas->nominal_spp;
-            }
-        });
+    //     static::creating(function ($student) {
+    //         $kelas = Kelas::find($student->kelas_id);
+    //         if ($kelas) {
+    //             $student->tagihan_spp = $kelas->nominal_spp;
+    //         }
+    //     });
 
-        static::updating(function ($student) {
-            $kelas = Kelas::find($student->kelas_id);
-            if ($kelas) {
-                $student->tagihan_spp = $kelas->nominal_spp;
-            }
-        });
-    }
+    //     static::updating(function ($student) {
+    //         $kelas = Kelas::find($student->kelas_id);
+    //         if ($kelas) {
+    //             $student->tagihan_spp = $kelas->nominal_spp;
+    //         }
+    //     });
+    // }
 }
 // hehe
