@@ -1,6 +1,3 @@
-
-markdown
-Copy code
 # EduPay-API
 
 EduPay-API is a Laravel-based API for managing student payments, including tuition fees, via Midtrans payment gateway.
@@ -18,22 +15,18 @@ EduPay-API is a Laravel-based API for managing student payments, including tuiti
 
 ```bash
 git clone https://github.com/RoihanArrafli/EduPay-API.git
-cd EduPay-API
+cd EduPay-API```
+
 Install dependencies:
-bash
-Copy code
-composer install
+```composer install```
 Copy the example .env file and configure your environment variables:
-bash
-Copy code
-cp .env.example .env
+```bash
+cp .env.example .env```
 Generate an application key:
-bash
-Copy code
-php artisan key:generate
+```bash
+php artisan key:generate``
 Set up your database and Midtrans credentials in the .env file:
-plaintext
-Copy code
+```plaintext
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -45,31 +38,29 @@ MIDTRANS_CLIENTKEY=your_midtrans_client_key
 MIDTRANS_SERVERKEY=your_midtrans_server_key
 MIDTRANS_IS_PRODUCTION=false
 MIDTRANS_IS_SANITIZED=true
-MIDTRANS_IS_3DS=true
+MIDTRANS_IS_3DS=true```
 Run the database migrations:
-bash
-Copy code
-php artisan migrate
+```bash
+php artisan migrate```
 Usage
 Adding a Class
-Endpoint: POST /api/v1/kelas
+**Endpoint:** ```POST``` ```/api/v1/kelas```
 
-Request Body:
+**Request Body:**
 
 json
-Copy code
-{
+```{
     "tingkat_kelas": "10",
     "nominal_spp": 200000
-}
-Adding a Student
-Endpoint: POST /api/v1/students/
+}```
+
+**Adding a Student**
+**Endpoint:** ```POST``` ```/api/v1/students/```
 
 Request Body:
 
 json
-Copy code
-{
+```{
     "nama": "nama",
     "alamat": "alamat",
     "jenis_kelamin": "jenis_kelamin",
@@ -77,19 +68,20 @@ Copy code
     "TTL": "TTL",
     "nis": "nis",
     "kelas_id": "sesuai id kelas yg ditambahkan"
-}
-Creating a Payment
-Endpoint: POST /api/v1/payments
+}```
+
+**Creating a Payment**
+**Endpoint:** ```POST``` ```/api/v1/payments```
 
 Request Body:
 
 json
-Copy code
-{
+```{
     "nis": "sesuaikan nis",
     "nama": "nama",
     "email": "email"
-}
+}```
+
 After sending the request, copy the redirect_url/checkout_link from the response and paste it into a web browser. Select a payment method, e.g., BRIVA, copy the BRIVA code and paste it into the Midtrans Simulator. You can change the bank according to the chosen payment method and click inquire -> pay.
 
 Logging
@@ -102,6 +94,5 @@ License
 This project is open-source and available under the MIT License.
 
 css
-Copy code
-
-Make sure to adjust any specific details and customize the text as needed. This `README.md` file
+```
+Make sure to adjust any specific details and customize the text as needed. This `README.md` file```
